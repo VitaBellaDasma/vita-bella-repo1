@@ -3,9 +3,10 @@
   { "name":"Mocha Frappe","category":"Frappe","desc":"Chocolate + coffee goodness.","prices":{"Regular":70,"Tall":80,"Venti":90} },
   { "name":"Cookies & Cream Frappe","category":"Frappe","desc":"Crushed cookies and creamy blend.","prices":{"Regular":70,"Tall":80,"Venti":90} },
   { "name":"Moringa Choco Frappe","category":"Frappe","desc":"Nutritious twist with malunggay.","prices":{"Regular":70,"Tall":80,"Venti":90} },
-  { "name":"Okinawa Milk Tea","category":"Milk Tea","desc":"Brown sugar notes, creamy.","prices":{"Regular":65,"Tall":75,"Venti":85} },
-  { "name":"Hokkaido Milk Tea","category":"Milk Tea","desc":"Caramel & toffee hints.","prices":{"Regular":65,"Tall":75,"Venti":85} },
+  { "name":"Okinawa Milk Tea","category":"Iced Drinks","desc":"Brown sugar notes, creamy.","prices":{"Regular":65,"Tall":75,"Venti":85} },
+  { "name":"Hokkaido Milk Tea","category":"Iced Drinks","desc":"Caramel & toffee hints.","prices":{"Regular":65,"Tall":75,"Venti":85} },
   { "name":"Ham & Cheese Pizza Slice","category":"Food","desc":"Savory ham with melted cheese.","prices":{"Slice":35,"Whole":180} },
   { "name":"Bacon & Cheese Pizza Slice","category":"Food","desc":"Crispy bacon and cheese.","prices":{"Slice":40,"Whole":190} },
   { "name":"Small Fries","category":"Food","desc":"Crispy and salty.","prices":{"Solo":25} }
+  { "name":"13 in 1","category":"Hot Drinks","desc":"Caramel & toffee hints.","prices":{"Regular":65,"Tall":75,"Venti":85} },
 ]
