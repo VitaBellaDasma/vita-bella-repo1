@@ -1,3 +1,152 @@
+'use client'
+import { useEffect, useMemo, useState } from 'react'
+import initialMenu from '../../data/menu.json'
+
+function cleanNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : undefined }
+
+export default function AdminMenuEditor(){
+  const [items, setItems] = useState([])
+  const [draft, setDraft] = useState({ name:'', category:'Frappe', desc:'', regular:'', tall:'', venti:'', slice:'', whole:'' })
+  const [filter, setFilter] = useState('All')
+
+  // Load from localStorage first, fall back to repo data
+  useEffect(()=>{
+    try{
+      const saved = localStorage.getItem('vb-menu')
+      if (saved) setItems(JSON.parse(saved))
+      else setItems(initialMenu)
+    } catch { setItems(initialMenu) }
+  },[])
+
+  // Persist to localStorage while editing
+  useEffect(()=>{ localStorage.setItem('vb-menu', JSON.stringify(items)) },[items])
+
+  const visible = useMemo(()=> filter==='All' ? items : items.filter(i=>i.category===filter), [items, filter])
+
+  function addItem(){
+    if(!draft.name.trim()) return alert('Please enter a name')
+    const prices = {}
+    const r=cleanNumber(draft.regular), t=cleanNumber(draft.tall), v=cleanNumber(draft.venti)
+    const s=cleanNumber(draft.slice),   w=cleanNumber(draft.whole)
+    if (draft.category === 'Food'){ if (s!==undefined) prices.Slice=s; if (w!==undefined) prices.Whole=w }
+    else { if (r!==undefined) prices.Regular=r; if (t!==undefined) prices.Tall=t; if (v!==undefined) prices.Venti=v }
+    setItems(prev => [{ name:draft.name.trim(), category:draft.category, desc:draft.desc.trim(), prices }, ...prev])
+    setDraft({ name:'', category:draft.category, desc:'', regular:'', tall:'', venti:'', slice:'', whole:'' })
+  }
+
+  function updateItem(idx, field, value){
+    setItems(prev=>{
+      const copy=[...prev]; const it={...(copy[idx]||{})}
+      if (['name','desc','category'].includes(field)) it[field]=value
+      else { it.prices={...(it.prices||{})}; const n=cleanNumber(value); if(n===undefined||value==='') delete it.prices[field]; else it.prices[field]=n }
+      copy[idx]=it; return copy
+    })
+  }
+
+  function removeItem(idx){
+    const name = items[idx]?.name || 'this item'
+    if(confirm(`Delete "${name}"?`)) setItems(prev=>prev.filter((_,i)=>i!==idx))
+  }
+
+  function downloadJSON(){
+    const blob = new Blob([JSON.stringify(items,null,2)], {type:'application/json'})
+    const url = URL.createObjectURL(blob); const a=document.createElement('a')
+    a.href=url; a.download='menu.json'; a.click(); URL.revokeObjectURL(url)
+  }
+
+  function resetToRepo(){
+    if(confirm('Reset to the version in the repo? This overwrites your edits.')) setItems(initialMenu)
+  }
+
+  const SizeInputs = ({cat, values, setValues}) => cat==='Food' ? (
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+      <input placeholder="Slice price" value={values.slice} onChange={e=>setValues(s=>({...s, slice:e.target.value}))}/>
+      <input placeholder="Whole price" value={values.whole} onChange={e=>setValues(s=>({...s, whole:e.target.value}))}/>
+    </div>
+  ) : (
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+      <input placeholder="Regular price" value={values.regular} onChange={e=>setValues(s=>({...s, regular:e.target.value}))}/>
+      <input placeholder="Tall price" value={values.tall} onChange={e=>setValues(s=>({...s, tall:e.target.value}))}/>
+      <input placeholder="Venti price" value={values.venti} onChange={e=>setValues(s=>({...s, venti:e.target.value}))}/>
+    </div>
+  )
+
+  return (
+    <main className="section">
+      <div className="container">
+        <h2 style={{margin:'0 0 6px'}}>Admin — Menu Editor</h2>
+        <div className="badge">Hidden page. Visit /admin to use it.</div>
+
+        {/* Add new item */}
+        <div className="card" style={{marginTop:12}}>
+          <div className="kicker">Add New Item</div>
+          <div style={{display:'grid',gap:8,marginTop:8}}>
+            <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:8}}>
+              <input placeholder="Item name" value={draft.name} onChange={e=>setDraft(s=>({...s, name:e.target.value}))}/>
+              <select value={draft.category} onChange={e=>setDraft(s=>({...s, category:e.target.value}))}>
+                <option>Frappe</option><option>Milk Tea</option><option>Food</option>
+              </select>
+            </div>
+            <textarea placeholder="Description" value={draft.desc} onChange={e=>setDraft(s=>({...s, desc:e.target.value}))}/>
+            <SizeInputs cat={draft.category} values={draft} setValues={setDraft}/>
+            <div style={{display:'flex',gap:8,marginTop:6,flexWrap:'wrap'}}>
+              <button className="btn" onClick={addItem}>Add Item</button>
+              <button className="btn" onClick={downloadJSON}>Download JSON</button>
+              <button className="btn" onClick={resetToRepo}>Reset to Repo Version</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter + count */}
+        <div style={{marginTop:12}}>
+          <span className="kicker">Filter:</span>{' '}
+          <select value={filter} onChange={e=>setFilter(e.target.value)}>
+            <option>All</option><option>Frappe</option><option>Milk Tea</option><option>Food</option>
+          </select>
+          <span className="badge" style={{marginLeft:8}}>Items: {visible.length}</span>
+        </div>
+
+        {/* Items list */}
+        <div className="grid" style={{marginTop:12}}>
+          {visible.map((item, idx)=>{
+            const i = items.indexOf(item); const isFood = item.category==='Food'; const p=item.prices||{}
+            return (
+              <div className="card" key={i}>
+                <div style={{display:'grid',gap:8}}>
+                  <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:8}}>
+                    <input value={item.name} onChange={e=>updateItem(i,'name',e.target.value)}/>
+                    <select value={item.category} onChange={e=>updateItem(i,'category',e.target.value)}>
+                      <option>Frappe</option><option>Milk Tea</option><option>Food</option>
+                    </select>
+                  </div>
+                  <textarea value={item.desc} onChange={e=>updateItem(i,'desc',e.target.value)}/>
+                  {isFood ? (
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                      <input placeholder="Slice" value={p.Slice??''} onChange={e=>updateItem(i,'Slice',e.target.value)}/>
+                      <input placeholder="Whole" value={p.Whole??''} onChange={e=>updateItem(i,'Whole',e.target.value)}/>
+                    </div>
+                  ) : (
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+                      <input placeholder="Regular" value={p.Regular??''} onChange={e=>updateItem(i,'Regular',e.target.value)}/>
+                      <input placeholder="Tall" value={p.Tall??''} onChange={e=>updateItem(i,'Tall',e.target.value)}/>
+                      <input placeholder="Venti" value={p.Venti??''} onChange={e=>updateItem(i,'Venti',e.target.value)}/>
+                    </div>
+                  )}
+                  <div style={{display:'flex',gap:8,justifyContent:'space-between',alignItems:'center'}}>
+                    <button className="btn" onClick={downloadJSON}>Download JSON</button>
+                    <button className="btn" onClick={()=>removeItem(i)} style={{background:'#ef4444'}}>Delete</button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {items.length===0 && <div className="card" style={{marginTop:12}}>No items yet. Add your first item above.</div>}
+      </div>
+    </main>
+  )
+}
 [
   {
     "name": "Classic Coffee Frappe",
