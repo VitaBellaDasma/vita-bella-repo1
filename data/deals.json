@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Tall Frappe + Slice Pizza + Small Fries",
+    "desc": "Save money with this classic combo.",
+    "price": 100
+  },
+  {
+    "title": "Whole Ham/Bacon Pizza + Two Tall Frappes",
+    "desc": "Best for sharing with a friend.",
+    "price": 250
+  },
+  {
+    "title": "Buy any Tall/Venti Frappe, Get 1 FREE Slice (Weekends)",
+    "desc": "Back to School Promo.",
+    "price": 0
+  }
+]
