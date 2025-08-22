@@ -21,7 +21,7 @@
   },
   {
     "name": "Cookies & Cream Frappe",
-    "category": "Frappe",
+    "category": "Hot Drinks",
     "desc": "Crushed cookies and creamy blend.",
     "prices": {
       "Regular": 70,
@@ -41,7 +41,7 @@
   },
   {
     "name": "Okinawa Milk Tea",
-    "category": "Milk Tea",
+    "category": "Iced Drinks",
     "desc": "Brown sugar notes, creamy.",
     "prices": {
       "Regular": 65,
@@ -51,7 +51,7 @@
   },
   {
     "name": "Hokkaido Milk Tea",
-    "category": "Milk Tea",
+    "category": "Iced Drinks",
     "desc": "Caramel & toffee hints.",
     "prices": {
       "Regular": 65,
